@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo de Produtos — Moranguinho Bolos</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="hero">
+      <p class="kicker">Catálogo de produtos</p>
+      <h1>Moranguinho Bolos</h1>
+      <p class="lede">Catálogo completo de sabores, por Kg. Escolha o seu, chame no WhatsApp e receba a encomenda fresquinha.</p>
+      <div class="facts">
+        <span><b>107</b> produtos</span>
+        <span><b>6</b> categorias</span>
+        <span>Pedido mínimo <b>R$ 30,00</b></span>
+        <span>Pedidos: <b>(15) 99727-5109</b></span>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="toolbar-inner">
+        <input type="search" id="searchInput" placeholder="Buscar produto ou ingrediente…" aria-label="Buscar produto">
+        <div class="chips" id="categoryChips">
+          <button class="chip" data-category="all" aria-pressed="true">Todos</button>
+          <button class="chip" data-category="choc" aria-pressed="false">Chocolate</button>
+          <button class="chip" data-category="branco" aria-pressed="false">Branco</button>
+          <button class="chip" data-category="esp" aria-pressed="false">Especiais</button>
+          <button class="chip" data-category="cas" aria-pressed="false">Caseiros</button>
+          <button class="chip" data-category="rech" aria-pressed="false">Recheados</button>
+          <button class="chip" data-category="doces" aria-pressed="false">Doces</button>
+        </div>
+      </div>
+    </div>
+
+    <main id="catalog"></main>
+
+    <p class="empty" id="emptyMessage" hidden>Nenhum produto encontrado para essa busca.</p>
+
+    <footer>
+      <p><b>Lojas</b></p>
+      <ul>
+        <li>Loja 01 — Av. Ipanema, 1228, Vila Angélica, Sorocaba</li>
+        <li>Loja 02 — Av. Vinicius de Moraes, 1993, Pq. São Bento</li>
+        <li>Loja 03 — Av. Ipanema, 3780, Jd. Novo Horizonte (Rede Bom Lugar)</li>
+        <li>Loja 04 — Av. Manoel Vieira, Jd. Santa Cruz, Araçoiaba da Serra (Rede Bom Lugar)</li>
+        <li>Loja 05 — Av. São João, 347, Quiosque 02 (Rede Bom Lugar)</li>
+      </ul>
+      <p style="margin-top:16px">Preços conforme exibidos no site em 16/09/2026 e sujeitos a alteração. Bolos de chocolate, brancos e especiais são vendidos <b>por quilo</b>; caseiros e doces são vendidos por unidade. O bolo zero açúcar exige encomenda com 3 dias de antecedência.</p>
+    </footer>
+
+  </div>
+
+  <!-- ============================================================
+       MODAL "STORY" — abre ao clicar em um card
+       ============================================================ -->
+  <div id="storyModal" class="story-modal" hidden aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="story-backdrop" data-close="true"></div>
+
+    <div class="story-content" role="document">
+      <button class="story-close" type="button" aria-label="Fechar" data-close="true">✕</button>
+
+      <div class="story-media">
+        <img id="storyImg" src="" alt="">
+        <span class="story-fallback" aria-hidden="true">🎂</span>
+        <div class="story-gradient"></div>
+
+        <div class="story-info">
+          <span class="story-badge" id="storyBadge">Categoria</span>
+          <h2 id="storyNome">Nome do produto</h2>
+          <p id="storyDescricao">Descrição</p>
+          <p id="storyFrase" class="story-frase">Frase de destaque</p>
+
+          <div class="story-preco">
+            <span class="story-now" id="storyPrecoNow">R$ 0,00</span>
+            <span class="story-was" id="storyPrecoWas">R$ 0,00</span>
+            <span class="story-unit" id="storyUnit">por kg</span>
+          </div>
+
+          <a class="story-cta" id="storyCta" href="#" target="_blank" rel="noopener">
+            Pedir no WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
