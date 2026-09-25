@@ -1,8 +1,8 @@
 // ============================================================
 //  CONFIGURAÇÃO DE IMAGENS
 // ============================================================
-const IMG_DIR = "Bolos/";
-const IMG_FALLBACK = "Bolos/placeholder.jpg";
+const IMG_DIR = "bolos/";
+const IMG_FALLBACK = "bolos/placeholder.jpg";
 const WHATSAPP_NUMERO = "5515997275109"; // (15) 99727-5109
 
 // ============================================================
