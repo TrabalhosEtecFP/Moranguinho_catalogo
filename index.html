@@ -3,8 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Catálogo de Produtos — Moranguinho Bolos</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Cardápio — Moranguinho Bolos &amp; Doces</title>
+  <meta name="description" content="Cardápio completo da Moranguinho Bolos &amp; Doces, em Sorocaba: bolos, bento cake, bolos espatulados, kit festa e mini docinhos. Escolha e peça pelo WhatsApp.">
+  <meta name="theme-color" content="#d6265a">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Moranguinho Bolos &amp; Doces — Cardápio">
+  <meta property="og:description" content="Veja os sabores, preços e peça pelo WhatsApp.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%93%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,46 +19,41 @@
   <div class="wrap">
 
     <header class="hero">
-      <p class="kicker">Catálogo de produtos</p>
-      <h1>Moranguinho Bolos</h1>
-      <p class="lede">Catálogo completo de sabores, por Kg. Escolha o seu, chame no WhatsApp e receba a encomenda fresquinha.</p>
+      <p class="kicker" data-config="kicker">Cardápio</p>
+      <h1 data-config="titulo">Moranguinho Bolos &amp; Doces</h1>
+      <p class="lede" data-config="lede">Bolos por kg, bento cake, espatulados, kit festa e mini docinhos. Escolha o seu, chame no WhatsApp e receba a encomenda fresquinha.</p>
       <div class="facts">
-        <span><b>107</b> produtos</span>
-        <span><b>6</b> categorias</span>
-        <span>Pedido mínimo <b>R$ 30,00</b></span>
-        <span>Pedidos: <b>(15) 99727-5109</b></span>
+        <span><b id="totalProdutos">101</b> produtos</span>
+        <span><b id="totalCategorias">7</b> categorias</span>
+        <span>Instagram <b data-config="instagram">@moranguinhobolos</b></span>
+        <span>Pedidos: <a class="tel" href="https://wa.me/5515997275109" data-whatsapp-geral target="_blank" rel="noopener"><b data-config="whatsapp_exibicao">(15) 99727-5109</b></a></span>
       </div>
     </header>
 
     <div class="toolbar">
       <div class="toolbar-inner">
-        <input type="search" id="searchInput" placeholder="Buscar produto ou ingrediente…" aria-label="Buscar produto">
-        <div class="chips" id="categoryChips">
-          <button class="chip" data-category="all" aria-pressed="true">Todos</button>
-          <button class="chip" data-category="choc" aria-pressed="false">Chocolate</button>
-          <button class="chip" data-category="branco" aria-pressed="false">Branco</button>
-          <button class="chip" data-category="esp" aria-pressed="false">Especiais</button>
-          <button class="chip" data-category="cas" aria-pressed="false">Caseiros</button>
-          <button class="chip" data-category="rech" aria-pressed="false">Recheados</button>
-          <button class="chip" data-category="doces" aria-pressed="false">Doces</button>
-        </div>
+        <input type="search" id="searchInput" placeholder="Buscar produto ou ingrediente…" aria-label="Buscar produto" autocomplete="off">
+        <div class="chips" id="categoryChips"></div>
       </div>
     </div>
 
-    <main id="catalog"></main>
+    <p id="resultStatus" class="sr-only" role="status" aria-live="polite"></p>
+
+    <main id="catalog" aria-live="polite"><p class="sec-note">Carregando cardápio…</p>
+      <noscript><p class="empty">Ative o JavaScript para ver o catálogo.</p></noscript>
+    </main>
 
     <p class="empty" id="emptyMessage" hidden>Nenhum produto encontrado para essa busca.</p>
 
     <footer>
       <p><b>Lojas</b></p>
       <ul>
-        <li>Loja 01 — Av. Ipanema, 1228, Vila Angélica, Sorocaba</li>
-        <li>Loja 02 — Av. Vinicius de Moraes, 1993, Pq. São Bento</li>
-        <li>Loja 03 — Av. Ipanema, 3780, Jd. Novo Horizonte (Rede Bom Lugar)</li>
-        <li>Loja 04 — Av. Manoel Vieira, Jd. Santa Cruz, Araçoiaba da Serra (Rede Bom Lugar)</li>
-        <li>Loja 05 — Av. São João, 347, Quiosque 02 (Rede Bom Lugar)</li>
+        <li data-config="loja1">Loja 01 — Avenida Ipanema, nº 1228, Vila Angélica, Sorocaba/SP — (15) 3213-8785 | (15) 99727-5109 (WhatsApp)</li>
+        <li data-config="loja2">Loja 02 — Avenida Vinicius de Moraes, nº 1993, Pq. São Bento, Sorocaba/SP — (15) 3293-4380 (WhatsApp)</li>
+        <li data-config="loja3">Loja 03 — Avenida Ipanema, nº 3780, Box Rede Bom Lugar — (15) 3223-3177 | (15) 97400-6392 (WhatsApp)</li>
+        <li data-config="loja4">Loja 04 — Avenida São João, nº 347, Votorantim, Box Rede Bom Lugar — (15) 99827-8601 (WhatsApp)</li>
       </ul>
-      <p style="margin-top:16px">Preços conforme exibidos no site em 16/09/2026 e sujeitos a alteração. Bolos de chocolate, brancos e especiais são vendidos <b>por quilo</b>; caseiros e doces são vendidos por unidade. O bolo zero açúcar exige encomenda com 3 dias de antecedência.</p>
+      <p style="margin-top:16px" data-config="rodape_nota">www.moranguinhobolos.com.br — Instagram @moranguinhobolos. Preços conforme o cardápio atual e sujeitos a alteração. Bolos, bento cake e espatulados são vendidos por quilo; kits festa por kit e mini docinhos por cento.</p>
     </footer>
 
   </div>
@@ -61,14 +61,14 @@
   <!-- ============================================================
        MODAL "STORY" — abre ao clicar em um card
        ============================================================ -->
-  <div id="storyModal" class="story-modal" hidden aria-hidden="true" role="dialog" aria-modal="true">
+  <div id="storyModal" class="story-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="storyNome">
     <div class="story-backdrop" data-close="true"></div>
 
     <div class="story-content" role="document">
       <button class="story-close" type="button" aria-label="Fechar" data-close="true">✕</button>
 
       <div class="story-media">
-        <img id="storyImg" src="" alt="">
+        <img id="storyImg" src="" alt="" decoding="async">
         <span class="story-fallback" aria-hidden="true">🎂</span>
         <div class="story-gradient"></div>
 
@@ -92,6 +92,9 @@
     </div>
   </div>
 
+  <script src="config.js"></script>
+  <script src="dados-padrao.js"></script>
+  <script src="dados.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -675,3 +675,67 @@ a {
     display: none;
   }
 }
+/* ============================================================
+   MELHORIAS: acessibilidade, foto ausente, contadores
+   ============================================================ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.card:focus-visible,
+.chip:focus-visible,
+.toggle-img:focus-visible,
+.story-close:focus-visible,
+.story-cta:focus-visible,
+.tel:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tel {
+  text-decoration: none;
+}
+
+.tel:hover b {
+  text-decoration: underline;
+}
+
+.chip-n {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-left: 2px;
+}
+
+/* Foto ausente: esconde a imagem quebrada e mostra o emoji */
+.card-media.sem-foto .card-img {
+  display: none;
+}
+
+.card-media.sem-foto .card-img-fallback {
+  display: flex;
+  font-size: 40px;
+}
+
+.story-media.sem-foto img#storyImg {
+  display: none;
+}
+
+.story-media.sem-foto .story-fallback {
+  display: flex;
+}
+
+/* Só levanta o card no hover em telas com mouse (evita "pulo" no toque) */
+@media (hover: none) {
+  .card:hover {
+    transform: none;
+  }
+}
+

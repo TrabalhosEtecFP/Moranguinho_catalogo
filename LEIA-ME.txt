@@ -1,0 +1,58 @@
+CATÁLOGO MORANGUINHO — versão com banco de dados (Supabase)
+
+COMO FUNCIONA
+- Os produtos, preços, categorias, textos e fotos novas ficam no banco (Supabase).
+- O site público (index.html) só LÊ o banco. Não tem nenhum código de edição.
+- Quem edita usa o painel em /admin (admin/index.html), com e-mail e senha.
+  O banco só aceita gravação de quem estiver autorizado (tabela "admins"), não importa o que
+  alguém faça no navegador. Essa é a diferença para o modelo anterior (senha no navegador).
+- Se o banco estiver fora do ar, o site mostra a última cópia salva no navegador do visitante
+  ou, na falta dela, a cópia local (dados-padrao.js). O site nunca fica em branco.
+
+PASSO A PASSO (uma vez só, uns 15 minutos)
+1) Crie uma conta e um projeto grátis em https://supabase.com (região: South America / São Paulo).
+   Guarde a senha do banco.
+2) No projeto, abra "SQL Editor" > New query:
+   a) cole TODO o conteúdo de supabase/schema.sql e clique em Run;
+   b) cole TODO o conteúdo de supabase/seed.sql e clique em Run (carrega o cardápio atual).
+3) "Authentication" > "Users" > "Add user" > "Create new user":
+   e-mail: matheusbertolai3@gmail.com
+   senha:  a combinada com você (digite só aqui, no painel do Supabase)
+   e marque "Auto Confirm User".
+4) Volte ao SQL Editor, cole o conteúdo de supabase/criar-admin.sql (já está com o
+   e-mail acima) e clique em Run. Isso libera esse e-mail para editar.
+5) IMPORTANTE: "Authentication" > "Sign In / Providers" (ou Settings) > desative
+   "Allow new users to sign up". Assim ninguém consegue criar conta sozinho.
+6) "Project Settings" > "API": copie o "Project URL" e a chave "anon public" e cole no arquivo
+   config.js. NUNCA use a chave "service_role" aqui.
+7) Publique a pasta inteira no seu site (as imagens da pasta bolos/ continuam sendo usadas).
+   O painel fica em  seusite.com.br/admin/
+
+USO DO PAINEL
+- Produtos: buscar, editar (nome, descrição, preço, preço antigo, categoria, ordem, foto),
+  esconder do site (desmarcar "Visível no site"), criar e excluir.
+- Categorias: criar ("+ Nova categoria", no topo da aba), renomear, mudar unidade/ordem/observação e excluir.
+  Ao excluir uma categoria que tem produtos, o painel pergunta: mover os produtos para outra
+  categoria ou excluí-los junto (pede um segundo clique para confirmar). Categoria sem produtos
+  não aparece no site.
+- Textos do site: título, frase de apresentação, WhatsApp, lojas e rodapé.
+- Fotos novas são reduzidas automaticamente e ficam no Storage do Supabase (bucket "fotos").
+  As fotos antigas continuam na pasta bolos/.
+- Cada salvamento aparece no site na hora (basta recarregar a página).
+
+BOAS PRÁTICAS
+- Use uma senha forte e exclusiva no painel. Quem tiver o e-mail e a senha edita o cardápio.
+- Para dar acesso a outra pessoa: crie o usuário (passo 3) e rode o passo 4 com o e-mail dela.
+  Para tirar o acesso: delete a linha dela na tabela admins (ou o usuário).
+- Faça cópias de segurança de vez em quando: Table Editor > produtos > Export > CSV.
+- Projetos do plano gratuito do Supabase podem ser pausados depois de um tempo sem uso
+  (confira a regra atual no site deles). Basta reativar no painel do Supabase.
+
+ARQUIVOS
+  index.html, style.css, script.js   site público
+  dados.js                           lê o banco (e o plano B)
+  dados-padrao.js                    cópia do cardápio (plano B)
+  config.js                          URL e chave pública do Supabase (você preenche)
+  admin/index.html                   painel de edição
+  supabase/schema.sql, seed.sql      tabelas, regras de segurança e dados iniciais
+  bolos/                             imagens (não foram alteradas)
