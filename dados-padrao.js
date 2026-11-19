@@ -1,5 +1,5 @@
-// Cópia dos dados do cardápio. O site usa esta cópia quando o banco (Supabase) não está
-// configurado ou está fora do ar. Os dados "de verdade" ficam no banco e são editados pelo painel /admin.
+// Cópia de reserva do cardápio. O site só usa esta cópia se não conseguir ler dados/dados.json.
+// Os dados "de verdade" ficam em dados/dados.json e são editados pelo painel /admin.
 window.DADOS_PADRAO = {
   categorias: [
     {"id":"choc","nome":"Bolo de Chocolate","nota":"Massa de chocolate. Valores por kg.","unidade":"por kg","ordem":10},

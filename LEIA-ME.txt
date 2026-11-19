@@ -1,58 +1,54 @@
-CATÁLOGO MORANGUINHO — versão com banco de dados (Supabase)
+CATÁLOGO MORANGUINHO — versão com painel por senha (sem Supabase)
 
 COMO FUNCIONA
-- Os produtos, preços, categorias, textos e fotos novas ficam no banco (Supabase).
-- O site público (index.html) só LÊ o banco. Não tem nenhum código de edição.
-- Quem edita usa o painel em /admin (admin/index.html), com e-mail e senha.
-  O banco só aceita gravação de quem estiver autorizado (tabela "admins"), não importa o que
-  alguém faça no navegador. Essa é a diferença para o modelo anterior (senha no navegador).
-- Se o banco estiver fora do ar, o site mostra a última cópia salva no navegador do visitante
-  ou, na falta dela, a cópia local (dados-padrao.js). O site nunca fica em branco.
+- Produtos, preços, categorias e textos ficam no arquivo dados/dados.json, dentro do seu próprio site.
+- O site (index.html) só LÊ esse arquivo.
+- Para editar, abra  seusite.com.br/admin/  e digite a senha. Cada "Salvar" já atualiza o site
+  (basta recarregar a página do cardápio).
+- Fotos novas enviadas pelo painel são reduzidas automaticamente e salvas na pasta bolos/.
+- Se o arquivo não carregar, o site mostra a última cópia guardada no navegador do visitante
+  ou, na falta dela, a cópia dados-padrao.js. O site nunca fica em branco.
 
-PASSO A PASSO (uma vez só, uns 15 minutos)
-1) Crie uma conta e um projeto grátis em https://supabase.com (região: South America / São Paulo).
-   Guarde a senha do banco.
-2) No projeto, abra "SQL Editor" > New query:
-   a) cole TODO o conteúdo de supabase/schema.sql e clique em Run;
-   b) cole TODO o conteúdo de supabase/seed.sql e clique em Run (carrega o cardápio atual).
-3) "Authentication" > "Users" > "Add user" > "Create new user":
-   e-mail: matheusbertolai3@gmail.com
-   senha:  a combinada com você (digite só aqui, no painel do Supabase)
-   e marque "Auto Confirm User".
-4) Volte ao SQL Editor, cole o conteúdo de supabase/criar-admin.sql (já está com o
-   e-mail acima) e clique em Run. Isso libera esse e-mail para editar.
-5) IMPORTANTE: "Authentication" > "Sign In / Providers" (ou Settings) > desative
-   "Allow new users to sign up". Assim ninguém consegue criar conta sozinho.
-6) "Project Settings" > "API": copie o "Project URL" e a chave "anon public" e cole no arquivo
-   config.js. NUNCA use a chave "service_role" aqui.
-7) Publique a pasta inteira no seu site (as imagens da pasta bolos/ continuam sendo usadas).
-   O painel fica em  seusite.com.br/admin/
+REQUISITO
+- A hospedagem precisa rodar PHP 7.4 ou mais novo (quase todas as hospedagens comuns rodam).
+  Sites em hospedagem só de arquivos estáticos (GitHub Pages, Netlify, etc.) NÃO servem para o painel.
+- As pastas dados/, bolos/ e admin/ precisam aceitar gravação (normalmente já aceitam;
+  se o painel avisar "sem permissão de escrita", ajuste a permissão da pasta para 755 ou 775
+  no gerenciador de arquivos da hospedagem).
+
+PASSO A PASSO (uma vez só)
+1) Envie a pasta inteira para a hospedagem (a mesma pasta onde está o index.html).
+2) Abra  seusite.com.br/admin/  — no primeiro acesso o painel pede para CRIAR a senha
+   (mínimo 8 caracteres). Faça isso logo depois de publicar, antes de qualquer outra pessoa.
+3) Pronto. Nas próximas vezes é só digitar a senha.
 
 USO DO PAINEL
 - Produtos: buscar, editar (nome, descrição, preço, preço antigo, categoria, ordem, foto),
   esconder do site (desmarcar "Visível no site"), criar e excluir.
-- Categorias: criar ("+ Nova categoria", no topo da aba), renomear, mudar unidade/ordem/observação e excluir.
-  Ao excluir uma categoria que tem produtos, o painel pergunta: mover os produtos para outra
-  categoria ou excluí-los junto (pede um segundo clique para confirmar). Categoria sem produtos
-  não aparece no site.
+- Categorias: criar, renomear, mudar unidade/ordem/observação e excluir. Ao excluir uma categoria
+  com produtos, o painel pergunta se move os produtos para outra ou se exclui junto.
+  Categoria sem produtos não aparece no site.
 - Textos do site: título, frase de apresentação, WhatsApp, lojas e rodapé.
-- Fotos novas são reduzidas automaticamente e ficam no Storage do Supabase (bucket "fotos").
-  As fotos antigas continuam na pasta bolos/.
-- Cada salvamento aparece no site na hora (basta recarregar a página).
+- Senha: aba "Senha" para trocar quando quiser.
 
-BOAS PRÁTICAS
-- Use uma senha forte e exclusiva no painel. Quem tiver o e-mail e a senha edita o cardápio.
-- Para dar acesso a outra pessoa: crie o usuário (passo 3) e rode o passo 4 com o e-mail dela.
-  Para tirar o acesso: delete a linha dela na tabela admins (ou o usuário).
-- Faça cópias de segurança de vez em quando: Table Editor > produtos > Export > CSV.
-- Projetos do plano gratuito do Supabase podem ser pausados depois de um tempo sem uso
-  (confira a regra atual no site deles). Basta reativar no painel do Supabase.
+SEGURANÇA
+- A senha é conferida no servidor (admin/api.php) e guardada criptografada em admin/senha.php.
+- 5 senhas erradas seguidas bloqueiam novas tentativas por 15 minutos.
+- Use uma senha forte e não a repita em outros lugares.
+- Esqueceu a senha? Apague o arquivo admin/senha.php pelo gerenciador de arquivos da hospedagem
+  e abra o painel de novo: ele pedirá para criar uma senha nova.
+- Produtos "escondidos" não aparecem no site, mas continuam dentro de dados/dados.json
+  (que é um arquivo público). Não coloque ali nada que precise ser secreto.
+
+COPIAS DE SEGURANÇA
+- A cada salvamento, a versão anterior é guardada em dados/backups/ (as 20 últimas).
+  Para desfazer algo, copie um desses arquivos por cima de dados/dados.json.
 
 ARQUIVOS
   index.html, style.css, script.js   site público
-  dados.js                           lê o banco (e o plano B)
-  dados-padrao.js                    cópia do cardápio (plano B)
-  config.js                          URL e chave pública do Supabase (você preenche)
+  dados.js                           lê dados/dados.json (e o plano B)
+  dados-padrao.js                    cópia de reserva do cardápio
+  dados/dados.json                   o cardápio (é aqui que o painel grava)
   admin/index.html                   painel de edição
-  supabase/schema.sql, seed.sql      tabelas, regras de segurança e dados iniciais
-  bolos/                             imagens (não foram alteradas)
+  admin/api.php                      senha, gravação e envio de fotos (roda no servidor)
+  bolos/                             imagens

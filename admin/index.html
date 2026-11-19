@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel — Moranguinho</title>
+<style>
+:root{--bg:#f6f2f3;--surface:#fff;--ink:#2a1f22;--soft:#6e5d62;--line:#e4d9dc;--accent:#c2185b;--accent-ink:#fff;--ok:#2e7d32;--erro:#c0392b}
+@media (prefers-color-scheme:dark){:root{--bg:#171214;--surface:#221a1d;--ink:#f1e7ea;--soft:#b3a0a6;--line:#3a2d31;--accent:#f06292;--accent-ink:#2a0b17;--ok:#7bd88f;--erro:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+textarea{resize:vertical;min-height:70px}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+label small{font-weight:400;color:var(--soft)}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;font-weight:600}
+button.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.perigo{color:var(--erro);border-color:var(--erro)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.caixa{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+#telaLogin{max-width:380px;margin:12vh auto;padding:0 16px}
+#telaLogin h1{margin:0 0 4px;font-size:22px}
+#telaLogin p{color:var(--soft);margin:0 0 8px}
+.erro{color:var(--erro);min-height:1.4em;margin:10px 0 0;font-size:14px}
+header.topo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--line)}
+header.topo h1{margin:0;font-size:18px}
+header.topo .quem{color:var(--soft);font-size:13px}
+nav{display:flex;gap:6px;padding:12px 20px 0;max-width:1000px;margin:0 auto;flex-wrap:wrap}
+nav button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+main{max-width:1000px;margin:0 auto;padding:16px 20px 80px}
+.barra{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.barra input{flex:2 1 200px}.barra select{flex:1 1 160px}
+.lista{display:grid;gap:8px}
+.linha{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.linha img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:var(--line)}
+.linha b{display:block}
+.linha span{color:var(--soft);font-size:13px}
+.tag{display:inline-block;background:var(--line);border-radius:999px;padding:1px 8px;font-size:12px;margin-left:6px}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cat{margin-bottom:12px}
+.cat .acoes,.rodape-dlg{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:20px;width:calc(100% - 24px);max-width:560px;max-height:92vh}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h2{margin:0 0 4px;font-size:18px}
+.foto{display:flex;gap:12px;align-items:center}
+.foto img{width:96px;height:96px;object-fit:cover;border-radius:10px;background:var(--line)}
+.check{display:flex;gap:8px;align-items:center;font-weight:600;margin-top:14px}.check input{width:auto}
+#aviso{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:92vw}
+#aviso.on{opacity:1}#aviso.ruim{background:var(--erro);color:#fff}
+@media (prefers-reduced-motion:reduce){#aviso{transition:none}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="telaLogin">
+  <form id="formLogin" class="caixa" hidden>
+    <h1>Painel Moranguinho</h1>
+    <p>Digite a senha para editar o cardápio.</p>
+    <label for="senha">Senha</label>
+    <input id="senha" type="password" autocomplete="current-password" required>
+    <p class="erro" id="erroLogin" role="alert"></p>
+    <button class="pri" type="submit" style="width:100%;margin-top:6px">Entrar</button>
+  </form>
+  <form id="formSetup" class="caixa" hidden>
+    <h1>Criar senha do painel</h1>
+    <p>Primeiro acesso: escolha uma senha (mínimo 8 caracteres). Guarde-a bem.</p>
+    <label for="nova1">Nova senha</label>
+    <input id="nova1" type="password" autocomplete="new-password" minlength="8" required>
+    <label for="nova2">Repita a senha</label>
+    <input id="nova2" type="password" autocomplete="new-password" minlength="8" required>
+    <p class="erro" id="erroSetup" role="alert"></p>
+    <button class="pri" type="submit" style="width:100%;margin-top:6px">Criar senha e entrar</button>
+  </form>
+  <p class="erro" id="erroGeral" role="alert" hidden></p>
+</div>
+
+<!-- PAINEL -->
+<div id="app" hidden>
+  <header class="topo">
+    <h1>Painel Moranguinho</h1>
+    <div>
+      <button type="button" id="btnVerSite">Ver site</button>
+      <button type="button" id="btnSair">Sair</button>
+    </div>
+  </header>
+  <nav role="tablist">
+    <button role="tab" data-aba="produtos" aria-selected="true">Produtos</button>
+    <button role="tab" data-aba="categorias" aria-selected="false">Categorias</button>
+    <button role="tab" data-aba="textos" aria-selected="false">Textos do site</button>
+    <button role="tab" data-aba="senha" aria-selected="false">Senha</button>
+  </nav>
+  <main>
+    <section id="aba-produtos">
+      <div class="barra">
+        <input type="search" id="busca" placeholder="Buscar produto…" aria-label="Buscar produto">
+        <select id="filtroCat" aria-label="Filtrar por categoria"></select>
+        <button class="pri" id="btnNovo">+ Novo produto</button>
+      </div>
+      <p id="contagem" style="color:var(--soft);font-size:13px"></p>
+      <div class="lista" id="lista"></div>
+    </section>
+    <section id="aba-categorias" hidden>
+      <details class="caixa cat" id="novaCat">
+        <summary style="cursor:pointer;font-weight:700">+ Nova categoria</summary>
+        <label>Nome <input id="ncNome"></label>
+        <div class="dupla">
+          <label>Unidade <small>(ex.: por kg)</small><input id="ncUnidade"></label>
+          <label>Ordem <small>(menor aparece primeiro)</small><input id="ncOrdem" type="number" value="100"></label>
+        </div>
+        <label>Observação <small>(aparece sob o título)</small><textarea id="ncNota"></textarea></label>
+        <div class="acoes"><button class="pri" id="btnCriarCat">Criar categoria</button></div>
+      </details>
+      <div id="listaCats"></div>
+    </section>
+    <section id="aba-textos" hidden>
+      <div class="caixa">
+        <div id="camposTextos"></div>
+        <div class="acoes"><button class="pri" id="btnSalvarTextos">Salvar textos</button></div>
+      </div>
+    </section>
+    <section id="aba-senha" hidden>
+      <form class="caixa" id="formSenha" style="max-width:420px">
+        <label for="sAtual">Senha atual</label>
+        <input id="sAtual" type="password" autocomplete="current-password" required>
+        <label for="sNova">Nova senha <small>(mínimo 8 caracteres)</small></label>
+        <input id="sNova" type="password" autocomplete="new-password" minlength="8" required>
+        <label for="sNova2">Repita a nova senha</label>
+        <input id="sNova2" type="password" autocomplete="new-password" minlength="8" required>
+        <div class="acoes"><button class="pri" type="submit">Trocar senha</button></div>
+      </form>
+    </section>
+  </main>
+</div>
+
+<!-- EDITAR PRODUTO -->
+<dialog id="dlg" aria-labelledby="dlgTitulo">
+  <form id="formProduto">
+    <h2 id="dlgTitulo">Produto</h2>
+    <label for="pCategoria">Categoria</label>
+    <select id="pCategoria" required></select>
+    <label for="pNome">Nome</label>
+    <input id="pNome" required maxlength="120">
+    <label for="pDescricao">Descrição</label>
+    <textarea id="pDescricao"></textarea>
+    <div class="dupla">
+      <div><label for="pPreco">Preço <small>(ex.: 72,90)</small></label><input id="pPreco" inputmode="decimal" required></div>
+      <div><label for="pAntigo">Preço antigo <small>(opcional, aparece riscado)</small></label><input id="pAntigo" inputmode="decimal"></div>
+    </div>
+    <label for="pOrdem">Ordem na categoria <small>(menor aparece primeiro)</small></label>
+    <input id="pOrdem" type="number">
+    <label>Foto</label>
+    <div class="foto">
+      <img id="pFoto" alt="Foto do produto">
+      <div>
+        <input type="file" id="pArquivo" accept="image/*" hidden>
+        <button type="button" id="btnFoto">Escolher foto…</button>
+        <button type="button" id="btnTirarFoto">Remover foto</button>
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" id="pAtivo"> Visível no site</label>
+    <p class="erro" id="erroProduto" role="alert"></p>
+    <div class="rodape-dlg">
+      <button type="button" class="perigo" id="btnExcluir">Excluir</button>
+      <span style="flex:1"></span>
+      <button type="button" id="btnFechar">Cancelar</button>
+      <button type="submit" class="pri" id="btnSalvar">Salvar</button>
+    </div>
+  </form>
+</dialog>
+<!-- EXCLUIR CATEGORIA COM PRODUTOS -->
+<dialog id="dlgCat" aria-labelledby="dcTitulo">
+  <h2 id="dcTitulo"></h2>
+  <p id="dcTexto"></p>
+  <label for="dcDestino">O que fazer com os produtos?</label>
+  <select id="dcDestino"></select>
+  <p class="erro" id="dcErro" role="alert"></p>
+  <div class="rodape-dlg">
+    <button type="button" id="dcCancelar">Cancelar</button>
+    <button type="button" class="perigo" id="dcConfirmar">Excluir categoria</button>
+  </div>
+</dialog>
+<div id="aviso" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+// =====================================================================
+//  PAINEL DE ADMINISTRAÇÃO — login só com senha.
+//  Fala com admin/api.php, que confere a senha e grava dados/dados.json e as fotos em bolos/.
+// =====================================================================
+const API = "api.php";
+let csrf = "";
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const semAcento = (t) => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const real = (v) => (v == null || v === "" ? "" : "R$ " + Number(v).toFixed(2).replace(".", ","));
+const virgula = (v) => (v == null || v === "" ? "" : Number(v).toFixed(2).replace(".", ","));
+function lerPreco(t) {
+  let s = String(t).replace(/[^\d.,]/g, "");
+  if (!s) return NaN;
+  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  return parseFloat(s);
+}
+// Foto: URL completa ou nome de arquivo da pasta /bolos
+const urlFoto = (img) => (!img ? "" : /^https?:\/\//i.test(img) ? img : "../bolos/" + encodeURI(img));
+const novoId = () => "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+let categorias = [], produtos = [], config = {};
+
+let temp;
+function aviso(msg, ruim) {
+  const a = $("#aviso");
+  a.textContent = msg;
+  a.classList.toggle("ruim", !!ruim);
+  a.classList.add("on");
+  clearTimeout(temp);
+  temp = setTimeout(() => a.classList.remove("on"), ruim ? 5000 : 2500);
+}
+
+// ---------- Telas ----------
+function mostrarLogin(modo) {
+  $("#app").hidden = true;
+  $("#telaLogin").hidden = false;
+  $("#formLogin").hidden = modo === "setup";
+  $("#formSetup").hidden = modo !== "setup";
+  csrf = "";
+  const campo = modo === "setup" ? "#nova1" : "#senha";
+  setTimeout(() => $(campo).focus(), 0);
+}
+
+// ---------- Comunicação com o servidor ----------
+async function chamar(acao, { metodo = "GET", corpo, raw = false, tipo } = {}) {
+  let r;
+  try {
+    r = await fetch(API + "?acao=" + acao, {
+      method: metodo,
+      credentials: "same-origin",
+      headers: {
+        ...(csrf ? { "X-CSRF-Token": csrf } : {}),
+        ...(corpo !== undefined && !raw ? { "Content-Type": "application/json" } : {}),
+        ...(tipo ? { "Content-Type": tipo } : {}),
+      },
+      body: corpo === undefined ? undefined : raw ? corpo : JSON.stringify(corpo),
+    });
+  } catch (_) {
+    throw new Error("Não foi possível conectar. Verifique a internet.");
+  }
+  let j = null;
+  try { j = JSON.parse(await r.text()); } catch (_) { /* resposta não era JSON */ }
+  if (!j) throw new Error("O servidor não respondeu como esperado. A hospedagem precisa ter PHP (arquivo admin/api.php).");
+  if (!r.ok) {
+    if (r.status === 401 && acao !== "entrar") mostrarLogin();
+    throw new Error(j.erro || "Erro " + r.status);
+  }
+  return j;
+}
+
+// Aplica a mudança na memória e grava no servidor; se der erro, desfaz.
+async function gravar(mutar) {
+  const antes = JSON.stringify({ categorias, produtos, config });
+  mutar();
+  try {
+    await chamar("salvar", { metodo: "POST", corpo: { categorias, produtos, config } });
+  } catch (e) {
+    const o = JSON.parse(antes);
+    categorias = o.categorias; produtos = o.produtos; config = o.config;
+    throw e;
+  }
+}
+
+// ---------- Login / primeiro acesso ----------
+$("#formLogin").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const erro = $("#erroLogin");
+  erro.textContent = "";
+  try {
+    const j = await chamar("entrar", { metodo: "POST", corpo: { senha: $("#senha").value } });
+    csrf = j.csrf;
+    $("#senha").value = "";
+    await entrar();
+  } catch (e) { erro.textContent = e.message; }
+});
+$("#formSetup").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const erro = $("#erroSetup");
+  erro.textContent = "";
+  const a = $("#nova1").value, b = $("#nova2").value;
+  if (a.length < 8) { erro.textContent = "A senha precisa ter pelo menos 8 caracteres."; return; }
+  if (a !== b) { erro.textContent = "As senhas não são iguais."; return; }
+  try {
+    const j = await chamar("configurar", { metodo: "POST", corpo: { senha: a } });
+    csrf = j.csrf;
+    $("#nova1").value = ""; $("#nova2").value = "";
+    await entrar();
+  } catch (e) { erro.textContent = e.message; }
+});
+$("#btnSair").addEventListener("click", async () => {
+  try { await chamar("sair", { metodo: "POST" }); } catch (_) { /* ok */ }
+  mostrarLogin();
+});
+$("#btnVerSite").addEventListener("click", () => window.open("../index.html", "_blank", "noopener"));
+
+async function entrar() {
+  const d = await chamar("dados");
+  categorias = d.categorias || []; produtos = d.produtos || []; config = d.config || {};
+  $("#telaLogin").hidden = true;
+  $("#app").hidden = false;
+  desenharTudo();
+}
+
+// ---------- Trocar senha ----------
+$("#formSenha").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const nova = $("#sNova").value;
+  if (nova !== $("#sNova2").value) { aviso("As senhas novas não são iguais.", true); return; }
+  try {
+    await chamar("trocar_senha", { metodo: "POST", corpo: { atual: $("#sAtual").value, nova } });
+    ["#sAtual", "#sNova", "#sNova2"].forEach((s) => { $(s).value = ""; });
+    aviso("Senha trocada.");
+  } catch (e) { aviso(e.message, true); }
+});
+
+// ---------- Abas ----------
+document.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("nav button").forEach((x) => x.setAttribute("aria-selected", x === b ? "true" : "false"));
+  ["produtos", "categorias", "textos", "senha"].forEach((n) => { $("#aba-" + n).hidden = n !== b.dataset.aba; });
+}));
+
+function desenharTudo() { desenharFiltro(); desenharProdutos(); desenharCategorias(); desenharTextos(); }
+const nomeCat = (id) => (categorias.find((c) => c.id === id) || {}).nome || id;
+
+// ---------- Produtos ----------
+function desenharFiltro() {
+  const atual = $("#filtroCat").value;
+  $("#filtroCat").innerHTML = '<option value="">Todas as categorias</option>' +
+    categorias.map((c) => `<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join("");
+  $("#filtroCat").value = categorias.some((c) => c.id === atual) ? atual : "";
+  $("#pCategoria").innerHTML = categorias.map((c) => `<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join("");
+}
+function desenharProdutos() {
+  const q = semAcento($("#busca").value.trim());
+  const cat = $("#filtroCat").value;
+  const ordemCat = (id) => (categorias.find((c) => c.id === id) || { ordem: 0 }).ordem;
+  const lista = produtos
+    .filter((p) => (!cat || p.categoria_id === cat) && (!q || semAcento(p.nome + " " + p.descricao).includes(q)))
+    .sort((a, b) => ordemCat(a.categoria_id) - ordemCat(b.categoria_id) || a.ordem - b.ordem);
+  $("#contagem").textContent = lista.length + " de " + produtos.length + " produtos";
+  $("#lista").innerHTML = lista.map((p) => `
+    <div class="linha">
+      <img src="${esc(urlFoto(p.imagem) || "../bolos/placeholder.jpg")}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+      <div><b>${esc(p.nome)}${p.ativo ? "" : '<span class="tag">escondido</span>'}</b>
+        <span>${esc(nomeCat(p.categoria_id))} · ${esc(real(p.preco))}${p.preco_antigo != null ? " (antes " + esc(real(p.preco_antigo)) + ")" : ""}</span></div>
+      <button data-editar="${esc(p.id)}">Editar</button>
+    </div>`).join("") || "<p>Nenhum produto encontrado.</p>";
+}
+$("#busca").addEventListener("input", desenharProdutos);
+$("#filtroCat").addEventListener("change", desenharProdutos);
+$("#lista").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-editar]");
+  if (b) abrirProduto(b.dataset.editar);
+});
+$("#btnNovo").addEventListener("click", () => abrirProduto(null));
+
+// Diálogo de produto
+let editando = null, fotoNova = null, removerFoto = false, confirmaExcluir = null;
+function mostrarFoto(url) { $("#pFoto").src = url || "../bolos/placeholder.jpg"; }
+function abrirProduto(id) {
+  const p = id ? produtos.find((x) => x.id === id) : null;
+  editando = p;
+  fotoNova = null; removerFoto = false;
+  $("#erroProduto").textContent = "";
+  $("#dlgTitulo").textContent = p ? "Editar produto" : "Novo produto";
+  const cat = p ? p.categoria_id : ($("#filtroCat").value || (categorias[0] || {}).id);
+  $("#pCategoria").value = cat;
+  $("#pNome").value = p ? p.nome : "";
+  $("#pDescricao").value = p ? p.descricao : "";
+  $("#pPreco").value = p ? virgula(p.preco) : "";
+  $("#pAntigo").value = p ? virgula(p.preco_antigo) : "";
+  const maior = Math.max(0, ...produtos.filter((x) => x.categoria_id === cat).map((x) => x.ordem));
+  $("#pOrdem").value = p ? p.ordem : maior + 10;
+  $("#pAtivo").checked = p ? p.ativo : true;
+  mostrarFoto(p ? urlFoto(p.imagem) : "");
+  $("#btnExcluir").hidden = !p;
+  $("#btnExcluir").textContent = "Excluir";
+  clearTimeout(confirmaExcluir);
+  $("#dlg").showModal();
+  $("#pNome").focus();
+}
+$("#btnFechar").addEventListener("click", () => $("#dlg").close());
+$("#btnFoto").addEventListener("click", () => $("#pArquivo").click());
+$("#btnTirarFoto").addEventListener("click", () => { fotoNova = null; removerFoto = true; mostrarFoto(""); });
+
+// Reduz a foto para até 1000 px (JPEG) antes de enviar
+function reduzirFoto(arquivo) {
+  return new Promise((ok, falha) => {
+    const url = URL.createObjectURL(arquivo);
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, 1000 / Math.max(im.width, im.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob((b) => (b ? ok(b) : falha(new Error("Não foi possível processar a imagem."))), "image/jpeg", 0.85);
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); falha(new Error("Esse arquivo não é uma imagem válida.")); };
+    im.src = url;
+  });
+}
+$("#pArquivo").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try {
+    fotoNova = await reduzirFoto(f);
+    removerFoto = false;
+    mostrarFoto(URL.createObjectURL(fotoNova));
+  } catch (err) { $("#erroProduto").textContent = err.message; }
+});
+async function enviarFoto(blob) {
+  const j = await chamar("foto", { metodo: "POST", corpo: blob, raw: true, tipo: "image/jpeg" });
+  return j.arquivo;   // nome do arquivo salvo em /bolos
+}
+
+$("#formProduto").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const erro = $("#erroProduto");
+  erro.textContent = "";
+  const preco = lerPreco($("#pPreco").value);
+  if (isNaN(preco) || preco < 0) { erro.textContent = "Preço inválido. Exemplo: 72,90"; return; }
+  const textoAntigo = $("#pAntigo").value.trim();
+  const antigo = textoAntigo ? lerPreco(textoAntigo) : null;
+  if (antigo !== null && (isNaN(antigo) || antigo < 0)) { erro.textContent = "Preço antigo inválido."; return; }
+  const btn = $("#btnSalvar");
+  btn.disabled = true; btn.textContent = "Salvando…";
+  try {
+    let imagem = editando ? editando.imagem : null;
+    if (fotoNova) imagem = await enviarFoto(fotoNova);
+    else if (removerFoto) imagem = null;
+    const corpo = {
+      categoria_id: $("#pCategoria").value,
+      nome: $("#pNome").value.trim(),
+      descricao: $("#pDescricao").value.trim(),
+      preco, preco_antigo: antigo, imagem,
+      ordem: parseInt($("#pOrdem").value, 10) || 0,
+      ativo: $("#pAtivo").checked,
+    };
+    await gravar(() => {
+      if (editando) Object.assign(editando, corpo);
+      else produtos.push({ id: novoId(), ...corpo });
+    });
+    desenharProdutos();
+    $("#dlg").close();
+    aviso("Produto salvo. Já aparece no site.");
+  } catch (e) {
+    erro.textContent = e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = "Salvar";
+  }
+});
+$("#btnExcluir").addEventListener("click", async (e) => {
+  const b = e.currentTarget;
+  if (!confirmaExcluir) {
+    b.textContent = "Clique de novo para excluir";
+    confirmaExcluir = setTimeout(() => { b.textContent = "Excluir"; confirmaExcluir = null; }, 3000);
+    return;
+  }
+  clearTimeout(confirmaExcluir); confirmaExcluir = null;
+  try {
+    const idExcluir = editando.id;
+    await gravar(() => { produtos = produtos.filter((p) => p.id !== idExcluir); });
+    desenharProdutos();
+    $("#dlg").close();
+    aviso("Produto excluído.");
+  } catch (err) { $("#erroProduto").textContent = err.message; b.textContent = "Excluir"; }
+});
+
+// ---------- Categorias ----------
+function desenharCategorias() {
+  $("#listaCats").innerHTML = categorias.map((c) => `
+    <div class="caixa cat" data-cat="${esc(c.id)}">
+      <h2 style="margin:0 0 4px;font-size:16px">${esc(c.nome)} <small style="color:var(--soft);font-weight:400">(${esc(c.id)} · ${produtos.filter((p) => p.categoria_id === c.id).length} produtos)</small></h2>
+      <label>Nome<input data-f="nome" value="${esc(c.nome)}"></label>
+      <div class="dupla">
+        <label>Unidade<input data-f="unidade" value="${esc(c.unidade)}"></label>
+        <label>Ordem<input data-f="ordem" type="number" value="${esc(c.ordem)}"></label>
+      </div>
+      <label>Observação<textarea data-f="nota">${esc(c.nota)}</textarea></label>
+      <div class="acoes">
+        <button class="perigo" data-acao="excluir">Excluir</button>
+        <button class="pri" data-acao="salvar">Salvar</button>
+      </div>
+    </div>`).join("");
+}
+let confirmaCat = null;
+$("#listaCats").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-acao]");
+  if (!b) return;
+  const box = b.closest("[data-cat]");
+  const id = box.dataset.cat;
+  try {
+    if (b.dataset.acao === "salvar") {
+      const f = (n) => box.querySelector(`[data-f="${n}"]`).value;
+      if (!f("nome").trim()) { aviso("O nome não pode ficar vazio.", true); return; }
+      await gravar(() => {
+        const c = categorias.find((x) => x.id === id);
+        Object.assign(c, { nome: f("nome").trim(), unidade: f("unidade").trim(), nota: f("nota").trim(), ordem: parseInt(f("ordem"), 10) || 0 });
+        categorias.sort((a, b) => a.ordem - b.ordem);
+      });
+      desenharTudo();
+      aviso("Categoria salva.");
+    } else {
+      const qtd = produtos.filter((p) => p.categoria_id === id).length;
+      if (qtd > 0) { abrirExcluirCat(id, qtd); return; }
+      if (confirmaCat !== id) {
+        confirmaCat = id; b.textContent = "Clique de novo para excluir";
+        setTimeout(() => { confirmaCat = null; b.textContent = "Excluir"; }, 3000);
+        return;
+      }
+      confirmaCat = null;
+      await gravar(() => { categorias = categorias.filter((c) => c.id !== id); });
+      desenharTudo();
+      aviso("Categoria excluída.");
+    }
+  } catch (err) { aviso(err.message, true); }
+});
+$("#btnCriarCat").addEventListener("click", async () => {
+  const nome = $("#ncNome").value.trim();
+  if (!nome) { aviso("Digite o nome da categoria.", true); return; }
+  let id = semAcento(nome).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) || "cat";
+  while (categorias.some((c) => c.id === id)) id += "-2";
+  try {
+    await gravar(() => {
+      categorias.push({ id, nome, unidade: $("#ncUnidade").value.trim(), nota: $("#ncNota").value.trim(), ordem: parseInt($("#ncOrdem").value, 10) || 0 });
+      categorias.sort((a, b) => a.ordem - b.ordem);
+    });
+    ["#ncNome", "#ncUnidade", "#ncNota"].forEach((s) => { $(s).value = ""; });
+    $("#novaCat").open = false;
+    desenharTudo();
+    aviso("Categoria criada. Ela só aparece no site depois de ter produtos.");
+  } catch (err) { aviso(err.message, true); }
+});
+
+// Excluir uma categoria que ainda tem produtos: mover os produtos ou apagá-los junto
+let catParaExcluir = null, confirmaTudo = null;
+function resetarConfirmaTudo() {
+  clearTimeout(confirmaTudo); confirmaTudo = null;
+  $("#dcConfirmar").textContent = "Excluir categoria";
+}
+function abrirExcluirCat(id, qtd) {
+  catParaExcluir = id;
+  const c = categorias.find((x) => x.id === id);
+  $("#dcTitulo").textContent = "Excluir “" + c.nome + "”";
+  $("#dcTexto").textContent = "Esta categoria tem " + qtd + (qtd > 1 ? " produtos." : " produto.");
+  $("#dcDestino").innerHTML = categorias.filter((x) => x.id !== id)
+    .map((x) => `<option value="${esc(x.id)}">Mover para: ${esc(x.nome)}</option>`).join("") +
+    `<option value="__apagar__">Excluir ${qtd > 1 ? "os " + qtd + " produtos" : "o produto"} junto</option>`;
+  $("#dcErro").textContent = "";
+  resetarConfirmaTudo();
+  $("#dlgCat").showModal();
+}
+async function excluirCategoria(id, destino) {
+  await gravar(() => {
+    if (destino === "__apagar__") produtos = produtos.filter((p) => p.categoria_id !== id);
+    else produtos.forEach((p) => { if (p.categoria_id === id) p.categoria_id = destino; });
+    categorias = categorias.filter((c) => c.id !== id);
+  });
+}
+$("#dcCancelar").addEventListener("click", () => $("#dlgCat").close());
+$("#dcDestino").addEventListener("change", resetarConfirmaTudo);
+$("#dcConfirmar").addEventListener("click", async (e) => {
+  const b = e.currentTarget, destino = $("#dcDestino").value;
+  if (destino === "__apagar__" && !confirmaTudo) {
+    b.textContent = "Clique de novo: apagar tudo";
+    confirmaTudo = setTimeout(resetarConfirmaTudo, 3000);
+    return;
+  }
+  resetarConfirmaTudo();
+  try {
+    await excluirCategoria(catParaExcluir, destino);
+    $("#dlgCat").close();
+    desenharTudo();
+    aviso(destino === "__apagar__" ? "Categoria e produtos excluídos." : "Produtos movidos e categoria excluída.");
+  } catch (err) { $("#dcErro").textContent = err.message; }
+});
+
+// ---------- Textos do site ----------
+const ROTULOS = {
+  kicker: "Selo acima do título", titulo: "Título do site", lede: "Frase de apresentação",
+  instagram: "Instagram", whatsapp_numero: "WhatsApp dos pedidos (só números, com 55 + DDD)",
+  whatsapp_exibicao: "WhatsApp como aparece escrito", loja1: "Loja 1", loja2: "Loja 2",
+  loja3: "Loja 3", loja4: "Loja 4", rodape_nota: "Nota do rodapé",
+};
+function desenharTextos() {
+  const chaves = Object.keys(ROTULOS).concat(Object.keys(config).filter((k) => !(k in ROTULOS)));
+  $("#camposTextos").innerHTML = chaves.map((k) => `
+    <label for="t-${esc(k)}">${esc(ROTULOS[k] || k)}</label>
+    <textarea id="t-${esc(k)}" data-chave="${esc(k)}" rows="${(config[k] || "").length > 90 ? 3 : 1}" style="min-height:0">${esc(config[k] || "")}</textarea>`).join("");
+}
+$("#btnSalvarTextos").addEventListener("click", async () => {
+  const linhas = [...document.querySelectorAll("#camposTextos [data-chave]")].map((t) => ({ chave: t.dataset.chave, valor: t.value.trim() }));
+  try {
+    await gravar(() => { linhas.forEach((l) => { config[l.chave] = l.valor; }); });
+    aviso("Textos salvos. Já aparecem no site.");
+  } catch (err) { aviso(err.message, true); }
+});
+
+// ---------- Início ----------
+(async function iniciar() {
+  try {
+    const e = await chamar("estado");
+    if (!e.configurada) { mostrarLogin("setup"); return; }
+    if (e.logado) { csrf = e.csrf; await entrar(); return; }
+    mostrarLogin();
+  } catch (err) {
+    mostrarLogin();
+    const g = $("#erroGeral");
+    g.textContent = err.message;
+    g.hidden = false;
+  }
+})();
+</script>
+</body>
+</html>

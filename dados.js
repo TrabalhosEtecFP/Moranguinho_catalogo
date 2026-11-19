@@ -1,30 +1,21 @@
 // ============================================================
 //  CARREGAMENTO DOS DADOS DO CARDÁPIO
-//  1) Banco (Supabase)  ->  2) última cópia salva no navegador  ->  3) dados-padrao.js
+//  1) arquivo dados/dados.json  ->  2) última cópia salva no navegador  ->  3) dados-padrao.js
 // ============================================================
-const CACHE_DADOS = "moranguinho-dados-v1";
+const CACHE_DADOS = "moranguinho-dados-v2";
 
-async function lerSupabase() {
-  const cfg = window.MORANGUINHO_CONFIG || {};
-  if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return null;
-  const base = cfg.SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/";
+async function lerDados() {
   const ctrl = new AbortController();
   const limite = setTimeout(() => ctrl.abort(), 7000);
-  const cab = { apikey: cfg.SUPABASE_ANON_KEY, Authorization: "Bearer " + cfg.SUPABASE_ANON_KEY };
   try {
-    const pegar = async (q) => {
-      const r = await fetch(base + q, { headers: cab, signal: ctrl.signal });
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.json();
+    const r = await fetch("dados/dados.json", { cache: "no-cache", signal: ctrl.signal });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = await r.json();
+    return {
+      categorias: d.categorias,
+      produtos: d.produtos.filter((p) => p.ativo !== false),   // escondidos não aparecem
+      config: d.config || {},
     };
-    const [categorias, produtos, linhasConfig] = await Promise.all([
-      pegar("categorias?select=*&order=ordem.asc"),
-      pegar("produtos?select=*&ativo=eq.true&order=ordem.asc"),
-      pegar("config?select=*"),
-    ]);
-    const config = {};
-    linhasConfig.forEach((l) => { config[l.chave] = l.valor; });
-    return { categorias, produtos, config };
   } finally {
     clearTimeout(limite);
   }
@@ -33,7 +24,7 @@ async function lerSupabase() {
 async function carregarDados() {
   let dados = null;
   try {
-    dados = await lerSupabase();
+    dados = await lerDados();
     if (dados) {
       try { localStorage.setItem(CACHE_DADOS, JSON.stringify(dados)); } catch (_) { /* ok */ }
     }
